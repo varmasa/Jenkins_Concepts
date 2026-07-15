@@ -11,3 +11,9 @@ This plugin offers a convenient domain-specific language (DSL) for performing so
 Block-scoped stages (stages that take a closure, see below) may occur in parallels but are not displayed in parallel.
 
 •Dynamic stages: in general, if you want to visualize dynamically changing stages, make it conditional to execute the stage contents, not conditional to include the stage Stage view can handle a limited subset of cases where you're appending additional stages.
+
+3.Jenkins webhook integration:
+
+Plugins:
+  GitHub Integration
+  Generic Webhook Trigger
