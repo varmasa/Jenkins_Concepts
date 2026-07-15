@@ -27,3 +27,4 @@ To upload artifact from jenkins to nexus.
 
 SonarQube Scanner
 Sonar Quality Gates
+Note: Here both sonarscan & qualityGates both must use this if sonar is through nrml & qualitygate is thorugh plugins will not work.
