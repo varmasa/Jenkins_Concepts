@@ -1,0 +1,11 @@
+Install pulgins from plugins info file
+
+
+Repo -> Settings -> Webhooks -> Add below
+
+PayloadURL: http://13.201.192.77:8080/github-webhook/
+ContentType: Application/JSON
+Just Push the event
+
+
+In Jenkins: GitHub hook trigger for GITScm polling (enable this)
