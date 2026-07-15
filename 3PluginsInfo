@@ -21,3 +21,9 @@ Plugins:
 4.Nexus Artifact Uploader
 
 To upload artifact from jenkins to nexus.
+
+
+5.Quality gates plugins (Decides whether the code passes predefined our quality standards (or) not. If it fails then pipeline will fail)
+
+SonarQube Scanner
+Sonar Quality Gates
