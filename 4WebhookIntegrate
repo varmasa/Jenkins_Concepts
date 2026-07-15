@@ -9,3 +9,7 @@ Just Push the event
 
 
 In Jenkins: GitHub hook trigger for GITScm polling (enable this)
+
+
+Note:
+  Jenkins compares the webhook repository with each job's configured Git repository. Whatever is matched jenkins wll run those pipelines.
