@@ -17,3 +17,7 @@ Block-scoped stages (stages that take a closure, see below) may occur in paralle
 Plugins:
   GitHub Integration
   Generic Webhook Trigger
+
+4.Nexus Artifact Uploader
+
+To upload artifact from jenkins to nexus.
