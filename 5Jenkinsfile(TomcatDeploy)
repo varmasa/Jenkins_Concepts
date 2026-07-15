@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    environment {
+        VERSION = "1.0.${BUILD_NUMBER}"
+    }
+    stages {
+        stage('Git checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/varmasa/JenkinsWithJavaWEBApp.git'
+            }
+        }
+        stage('Maven Build') {
+            steps {
+                dir('webapp-java') {
+                  sh 'mvn clean package'
+                }
+            }
+        }
+       stage('Nexus Artifact') {
+           steps{
+               nexusArtifactUploader credentialsId: '53f69e91-a50d-4010-83db-38ac9b569935', 
+               groupId: 'com.example', 
+               nexusUrl: '13.201.192.77:8081', 
+               nexusVersion: 'nexus3', 
+               protocol: 'http', 
+               repository: 'Webapp', 
+               version: "${VERSION}",
+               artifacts: [
+                    [
+                        artifactId: 'hello-webapp',
+                        classifier: '',
+                        file: 'webapp-java/target/hello-webapp.war',
+                        type: 'war'
+                    ]
+                ]
+           }
+       }
+       stage('Sonar Scan') {
+            steps {
+                dir('webapp-java') {
+                sh '''
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=webapp \
+                    -Dsonar.host.url=http://13.201.192.77:9000 \
+                    -Dsonar.login=sqp_c2f59f2ef4633b8b932457494056e0e12a58178b
+                '''
+            }
+          }
+       }
+       stage('Deploy To Tomcat') {
+            steps {
+                deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: '8b71672f-7276-4747-b1b0-24f07cf4a139', path: '', url: 'http://13.201.192.77:8082/')], contextPath: 'hello-webapp', war: 'webapp-java/target/hello-webapp.war'
+            }
+       }
+   }
+}
