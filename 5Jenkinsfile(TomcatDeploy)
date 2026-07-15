@@ -47,6 +47,16 @@ pipeline {
             }
           }
        }
+       stage('OWASP Dependency Check') {
+            steps {
+                 dependencyCheck additionalArguments: '--scan webapp-java', odcInstallation: 'OWASP-DC'
+            }
+       }
+       stage('Publish OWASP Report') {
+            steps {
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+       }
        stage('Deploy To Tomcat') {
             steps {
                 deploy adapters: [tomcat9(alternativeDeploymentContext: '', credentialsId: '8b71672f-7276-4747-b1b0-24f07cf4a139', path: '', url: 'http://13.201.192.77:8082/')], contextPath: 'hello-webapp', war: 'webapp-java/target/hello-webapp.war'
