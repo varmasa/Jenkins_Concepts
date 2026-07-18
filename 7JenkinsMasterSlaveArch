@@ -66,3 +66,23 @@ Pipeline:
         }
     }
 }
+
+Flow:
+
+Controller
+----------
+Jenkins service
+User: jenkins
+Private Key:
+/var/lib/jenkins/.ssh/id_rsa
+        |
+        | SSH
+        v
+Agent
+-----
+Login user: ec2-user
+Authorized key:
+/home/ec2-user/.ssh/authorized_keys
+
+
+Note: since we copied keys to agents in ec2-user dir we need to give obly tgat user in PrivateKey Controller.
