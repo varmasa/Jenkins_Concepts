@@ -1,0 +1,68 @@
+Launch 3 Servers with same Keypair & same SecurityGroup
+
+Install jenkins on Master
+Install java on both Master & Slave
+Port 8080 on controller & Port 22 on both controller, agents
+Create jenkins user on both agents with pwd
+Install Git on Agents
+Generate SSH Key using jenkins user & copy public key to both agents
+
+Dashboard → Manage Jenkins → Nodes → New Node (Add both agents)
+
+Fill in the details:
+
+Node name: agent1
+Type: Permanent Agent
+
+Then configure:
+
+Field	Value
+Remote root directory	/home/ec2-user/jenkins
+Labels	linux
+Usage	Use this node as much as possible
+Launch method	Launch agents via SSH
+Host	172.31.39.71 (your agent private IP)
+Credentials	SSH private key of the controller's jenkins user
+Host Key Verification Strategy	Non verifying Verification Strategy (for lab/testing) or Known hosts (recommended for production)
+
+Set Disk Space Monitoring Thresholds (Free Disk Space & Temp Space) 
+
+  Note: If we don't set the Agents will go offline due to less space.
+
+Click Save.
+
+
+Pipeline:
+
+  pipeline {
+    agent none
+
+    stages {
+
+        stage('Run on Agent1') {
+            agent {
+                label 'LinuxAgent1'
+            }
+            steps {
+                sh '''
+                    echo "Running on Agent1"
+                    hostname
+                    whoami
+                '''
+            }
+        }
+
+        stage('Run on Agent2') {
+            agent {
+                label 'LinuxAgent2'
+            }
+            steps {
+                sh '''
+                    echo "Running on Agent2"
+                    hostname
+                    whoami
+                '''
+            }
+        }
+    }
+}
