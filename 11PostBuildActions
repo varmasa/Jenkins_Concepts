@@ -1,3 +1,5 @@
+Relatime: It was used to send mails post deployment & workspace cleanup
+
 pipeline {
     agent any
 
