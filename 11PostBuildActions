@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                echo "Building..."
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running Tests..."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying..."
+            }
+        }
+    }
+
+    post {
+
+        always {
+            echo "Pipeline Finished"
+        }
+
+        success {
+            echo "Build Successful"
+        }
+
+        failure {
+            echo "Build Failed"
+            mail to: "devops@example.com",
+                 subject: "Build Failed",
+                 body: "Please check Jenkins."
+        }
+
+        unstable {
+            echo "Tests Failed"
+        }
+
+        aborted {
+            echo "Build Aborted"
+        }
+
+        changed {
+            echo "Status Changed"
+        }
+
+        cleanup {
+            cleanWs()
+        }
+    }
+}
