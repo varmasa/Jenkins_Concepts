@@ -1,0 +1,20 @@
+sudo systemctl stop jenkins
+sudo tar -czvf jenkins-backup-$(date +%F).tar.gz /var/lib/jenkins
+sudo systemctl start jenkins
+ls -lh jenkins-backup-*.tar.gz
+
+tar -czf jenkins-backup.tar.gz /var/lib/jenkins
+aws s3 cp jenkins-backup.tar.gz s3://my-jenkins-backup/ (Backup to S3)
+
+Manage Jenkins
+→ Plugins
+→ Available Plugins
+→ ThinBackup
+Choose:
+  Backup directory
+  Schedule
+  Items to include/exclude
+
+ThinBackup backs up Jenkins configuration, jobs, plugins, and credentials. It typically does not back up workspaces or build artifacts by default.
+
+Note: Need to specify backuppath/cron in  "ManageJenkins -> System -> ThinBackup Configuration"
