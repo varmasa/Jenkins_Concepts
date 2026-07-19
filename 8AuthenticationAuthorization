@@ -18,4 +18,42 @@ Authorization:
 
 Manage Jenkins
 ↓
-Security -> Matrix-based security -> Click on Add Users (Give permission to user like Build Job, View Job, Configure Job)
+Security -> Matrix-based security(At Job Level applies to all jobs same authorization) -> Click on Add Users (Give permission to user like Build Job, View Job, Configure Job)
+
+
+To implement Specify User needs to access only specific jobs (Role-based strategy)
+
+Manage Jenkins
+→ Security -> Role-Based Strategy -> save
+
+Manage Jenkins → Manage and Assign Roles → Manage Roles
+
+Under Job Roles, create a role such as:
+    Role Name	Pattern
+    Build-App1	^App1$
+
+The pattern uses a regular expression:
+
+^App1$ → matches only the job named App1
+^Dev-.* → matches all jobs starting with Dev-
+.* → matches every job
+
+
+
+Matrix-based Security (configured under Manage Jenkins → Security) applies globally. The permissions you assign there apply to all jobs in Jenkins.
+
+For example:
+
+User	Overall Read	Job Read	Job Build	Result
+saivarma	✅	✅	✅	Can build every job
+tester	    ✅	✅	❌	Can view every job but cannot build any
+
+There is no way to restrict access to only specific jobs using the global Matrix-based Security alone.
+
+
+
+
+Jenkins Roles
+├── Global (Jenkins itself)
+├── Items (Jobs, Pipelines, Folders)
+└── Agents (Build Nodes)
