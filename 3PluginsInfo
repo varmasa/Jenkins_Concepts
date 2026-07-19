@@ -33,3 +33,5 @@ Note: Here both sonarscan & qualityGates both must use this if sonar is through 
 6.Deploy to container (Used to deploy war to tomcat)
 
 7.Role-based Authorization Strategy (Enables user authorization using a Role-Based strategy. Roles can be defined globally or for particular jobs or nodes selected by regular expressions).
+
+8.ThinBackup (Backups the most important global and job specific configuration files).
