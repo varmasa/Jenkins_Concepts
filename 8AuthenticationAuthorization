@@ -1,0 +1,21 @@
+Authentication and Authorization in Jenkins are two separate concepts:
+
+Authentication: Verifies who the user is (username/password, LDAP, Active Directory, GitHub OAuth, SAML, etc.).
+Authorization: Determines what the authenticated user is allowed to do (admin, developer, read-only, etc.).
+
+
+
+Authentication: 
+
+Manage Jenkins
+    ↓
+Security
+    ↓
+Users (Create User)
+
+
+Authorization:
+
+Manage Jenkins
+↓
+Security -> Matrix-based security -> Click on Add Users (Give permission to user like Build Job, View Job, Configure Job)
