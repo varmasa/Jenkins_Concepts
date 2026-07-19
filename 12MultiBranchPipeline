@@ -1,0 +1,181 @@
+Without Multibranch Pipeline (Single Pipeline Job)
+
+Suppose your Git repository has these branches:
+
+JavaWebApp
+├── main
+├── dev
+├── feature-login
+├── feature-payment
+
+You create a Pipeline job called:
+
+JavaWebApp-Build
+
+In the job configuration, you specify one branch, for example:
+
+Branch:
+main
+Workflow
+Developer
+      │
+      ▼
+Push code to main
+      │
+      ▼
+Jenkins Pipeline Job
+      │
+      ▼
+Build
+
+If another developer pushes to the dev branch:
+
+dev
+
+Nothing happens because the job is configured only for main.
+
+If you also want to build dev, you need another job:
+
+JavaWebApp-Main
+JavaWebApp-Dev
+JavaWebApp-FeatureLogin
+JavaWebApp-FeaturePayment
+Disadvantages
+One Jenkins job per branch.
+Manual creation of new jobs.
+Manual deletion of jobs when branches are removed.
+Difficult to manage many feature branches.
+
+
+
+With Multibranch Pipeline
+
+Now create one Multibranch Pipeline job:
+
+JavaWebApp
+
+Jenkins scans the repository:
+
+JavaWebApp
+├── main
+├── dev
+├── feature-login
+└── feature-payment
+
+Each branch gets its own pipeline automatically.
+
+Workflow
+Developer
+      │
+      ▼
+Push to feature-login
+      │
+      ▼
+GitHub Webhook
+      │
+      ▼
+Jenkins scans repository
+      │
+      ▼
+Creates feature-login pipeline
+      │
+      ▼
+Runs Jenkinsfile
+
+No manual job creation is needed.
+
+Real-World Example
+
+Assume a banking application.
+
+Repository:
+
+BankApp
+├── main
+├── develop
+├── release
+├── feature-UPI
+├── feature-Loans
+├── feature-CreditCard
+Without Multibranch
+
+You would create:
+
+BankApp-Main
+BankApp-Develop
+BankApp-Release
+BankApp-UPI
+BankApp-Loans
+BankApp-CreditCard
+
+Every new feature branch requires a new Jenkins job.
+
+If there are 100 feature branches, you would potentially have 100 jobs to manage.
+
+With Multibranch
+
+Only one job exists:
+
+BankApp
+
+Jenkins automatically creates:
+
+BankApp
+
+├── main
+├── develop
+├── release
+├── feature-UPI
+├── feature-Loans
+└── feature-CreditCard
+
+When feature-UPI is deleted from Git, Jenkins can remove the corresponding branch job during the next scan.
+
+
+
+Different Jenkinsfiles Per Branch
+
+One of the biggest advantages is that each branch can have a different Jenkinsfile.
+
+
+| Feature             | Pipeline Job           | Multibranch Pipeline                            |
+| ------------------- | ---------------------- | ----------------------------------------------- |
+| Number of jobs      | One per branch         | One parent job for all branches                 |
+| New branch          | Manual job creation    | Automatic discovery                             |
+| Deleted branch      | Manual cleanup         | Automatic cleanup (with orphaned item strategy) |
+| Pull Request builds | Manual or custom setup | Automatic (with GitHub Branch Source)           |
+| Jenkinsfile         | One configured branch  | Read from each branch                           |
+| Best for            | Single branch projects | GitFlow, feature branches, team development     |
+
+When to Use Each
+Use a Pipeline Job when:
+The project has only one branch (for example, main).
+You have a simple CI/CD workflow.
+You're building from a fixed branch.
+
+Examples:
+
+Infrastructure repositories
+Utility scripts
+Internal automation jobs
+Use a Multibranch Pipeline when:
+Your team follows GitFlow or feature-branch development.
+Developers regularly create feature branches.
+You want automatic branch and pull request builds.
+Each branch may have its own pipeline logic.
+
+Examples:
+
+Java Spring Boot applications
+Node.js applications
+Microservices
+Enterprise applications with multiple developers
+
+
+
+Why do we use a Multibranch Pipeline instead of a normal Pipeline?
+
+Answer:
+A normal Pipeline job is tied to a specific branch, so you need separate Jenkins jobs for additional branches. A Multibranch Pipeline automatically discovers branches containing a 
+Jenkinsfile, creates and manages branch-specific pipeline jobs, builds pull requests (when integrated with GitHub, GitLab, or Bitbucket), and cleans up jobs for deleted branches. 
+This greatly reduces manual administration and is the preferred approach for projects that use feature branches or GitFlow.
