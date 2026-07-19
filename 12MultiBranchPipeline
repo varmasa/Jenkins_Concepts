@@ -179,3 +179,82 @@ Answer:
 A normal Pipeline job is tied to a specific branch, so you need separate Jenkins jobs for additional branches. A Multibranch Pipeline automatically discovers branches containing a 
 Jenkinsfile, creates and manages branch-specific pipeline jobs, builds pull requests (when integrated with GitHub, GitLab, or Bitbucket), and cleans up jobs for deleted branches. 
 This greatly reduces manual administration and is the preferred approach for projects that use feature branches or GitFlow.
+
+
+
+Scenario 1: Developer commits to dev
+Developer
+    │
+    ▼
+git push origin dev
+    │
+    ▼
+GitHub Webhook
+    │
+    ▼
+Jenkins receives webhook
+    │
+    ▼
+Jenkins checks which branch changed
+    │
+    ▼
+Only the "dev" pipeline is triggered
+
+Result:
+
+✔ dev    → Build starts
+✖ main   → No build
+Scenario 2: Developer commits to main
+git push origin main
+
+Result:
+
+✔ main   → Build starts
+✖ dev    → No build
+Scenario 3: Developers commit to both branches
+
+Developer A:
+
+git push origin dev
+
+Developer B:
+
+git push origin main
+
+Result:
+
+✔ dev    → Separate build
+✔ main   → Separate build
+
+These are independent pipeline jobs and can even run at the same time if Jenkins has available executors.
+
+Visual Representation
+                GitHub Repository
+              ┌──────────────────┐
+              │ main             │
+              │ dev              │
+              └──────────────────┘
+                     │
+           GitHub Webhook/Event
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+ Push to main              Push to dev
+        │                         │
+        ▼                         ▼
+Build main pipeline      Build dev pipeline
+Why is this useful?
+
+Imagine a team of 10 developers:
+
+8 developers work on the dev branch.
+1 developer fixes a production issue on the main branch.
+
+If someone pushes to dev, Jenkins doesn't rebuild main, because there were no changes there. Only the pipeline for the changed branch runs, saving build time and resources.
+
+Interview Answer
+
+Q: In a Multibranch Pipeline, if a developer commits only to the dev branch, will Jenkins build all branches?
+
+Answer: No. Jenkins creates a separate pipeline for each discovered branch. When a commit is pushed to dev, only the dev branch pipeline is triggered. The main branch pipeline is not
+triggered unless there is a change in the main branch (or someone manually starts a build). This allows each branch to be built and tested independently.
