@@ -1,0 +1,138 @@
+s1: Login Slack
+
+s2: Create an App (https://api.slack.com/apps) from scratch
+App Name: Jenkins
+Workspace: DevOps
+Click Create App.
+
+Step 3: Add OAuth Scopes
+
+On the left menu, go to:
+
+OAuth & Permissions
+
+Under Bot Token Scopes, add these scopes:
+
+chat:write
+chat:write.public
+files:write
+channels:read
+groups:read
+Step 4: Install the App
+
+Scroll to the top of the same page and click:
+
+Install to Workspace
+
+Approve the permissions.
+
+Step 5: Copy the Bot Token
+
+After installation you'll see:
+
+Bot User OAuth Token: "token"
+
+This xoxb-... token is what Jenkins uses.
+
+Step 6: Add the Token in Jenkins
+
+Go to:
+
+Manage Jenkins
+    ↓
+Credentials
+    ↓
+Global
+    ↓
+Add Credentials
+
+Choose:
+
+Kind:
+Secret text
+
+Secret:
+
+xoxb-xxxxxxxxxxxxxxxx
+
+ID:
+
+slack-token
+Step 7: Configure the Slack Plugin
+
+Go to:
+
+Manage Jenkins
+    ↓
+Configure System
+    ↓
+Slack
+
+Configure:
+
+Workspace Name:
+DevOps
+
+Credential:
+slack-token
+
+Default Channel:
+#all-devops
+
+Click Test Connection.
+
+
+
+
+Pipeline:
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                echo "Building application..."
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+            }
+        }
+    }
+
+    post {
+        success {
+            slackSend(
+                channel: '#all-devops',
+                color: 'good',
+                message: """✅ *Build Successful*
+*Job:* ${env.JOB_NAME}
+*Build:* #${env.BUILD_NUMBER}
+*Branch:* ${env.BRANCH_NAME}
+*URL:* ${env.BUILD_URL}"""
+            )
+        }
+
+        failure {
+            slackSend(
+                channel: '#all-devops',
+                color: 'danger',
+                message: """❌ *Build Failed*
+*Job:* ${env.JOB_NAME}
+*Build:* #${env.BUILD_NUMBER}
+*URL:* ${env.BUILD_URL}"""
+            )
+        }
+
+        unstable {
+            slackSend(
+                channel: '#all-devops',
+                color: 'warning',
+                message: "⚠️ ${env.JOB_NAME} #${env.BUILD_NUMBER} is UNSTABLE.\n${env.BUILD_URL}"
+            )
+        }
+    }
+}
