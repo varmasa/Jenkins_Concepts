@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+
+    parameters {
+
+        string(
+            name: 'APP_NAME',
+            defaultValue: 'myapp',
+            description: 'Application Name'
+        )
+
+        text(
+            name: 'DESCRIPTION',
+            defaultValue: 'Deploy application',
+            description: 'Deployment Description'
+        )
+
+        booleanParam(
+            name: 'RUN_TESTS',
+            defaultValue: true,
+            description: 'Run Unit Tests'
+        )
+
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['DEV', 'QA', 'UAT', 'PROD'],
+            description: 'Select Environment'
+        )
+
+        password(
+            name: 'DB_PASSWORD',
+            defaultValue: '',
+            description: 'Database Password'
+        )
+    }
+
+    stages {
+
+        stage('Print Parameters') {
+            steps {
+                echo "Application : ${params.APP_NAME}"
+                echo "Description : ${params.DESCRIPTION}"
+                echo "Environment : ${params.ENVIRONMENT}"
+                echo "Run Tests   : ${params.RUN_TESTS}"
+                echo "Password    : ${params.DB_PASSWORD}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building ${params.APP_NAME}"
+            }
+        }
+
+        stage('Testing') {
+            when {
+                expression { params.RUN_TESTS }
+            }
+            steps {
+                echo "Running Tests..."
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Deploying ${params.APP_NAME} to ${params.ENVIRONMENT}"
+            }
+        }
+    }
+}
