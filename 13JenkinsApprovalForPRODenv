@@ -1,0 +1,67 @@
+Approvals in Jenkins are used to pause a pipeline and wait for manual confirmation before proceeding to the next stage. This is commonly used 
+before deploying to production or other sensitive environments.
+
+The pipeline automatically builds, tests, and deploys to DEV/QA.
+Before deploying to PROD, Jenkins pauses and waits for an authorized person to approve.
+
+
+Usecase:
+
+Build
+   ↓
+Unit Test
+   ↓
+Deploy to DEV
+   ↓
+Deploy to QA
+   ↓
+❓ Approval Required
+   ↓
+Deploy to PROD
+
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                echo "Building Application..."
+            }
+        }
+
+        stage('Deploy to DEV') {
+            steps {
+                echo "Deploying to DEV..."
+            }
+        }
+
+        stage('Approval') {
+        steps {
+        script {
+            def approver = input(
+                message: 'Deploy to Production?',
+                ok: 'Deploy',
+                submitter: 'vamsi',
+                submitterParameter: 'APPROVED_BY'
+            )
+
+            echo "Approved by: ${approver}"
+        }
+    }
+}
+
+        stage('Deploy to PROD') {
+            steps {
+                echo "Deploying to Production..."
+            }
+        }
+    }
+}
+
+
+If pipeline ran user has Overall → Administer, Jenkins administrators can approve any input step regardless of the submitter list. If he is not in the list since he can approve due to
+admin access.
+
+
+Creating users without admin access can test this process.
