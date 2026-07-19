@@ -1,3 +1,5 @@
+Slack is a notification tool can integrate with jenkins.
+
 s1: Login Slack
 
 s2: Create an App (https://api.slack.com/apps) from scratch
