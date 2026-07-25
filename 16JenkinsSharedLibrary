@@ -1,0 +1,108 @@
+Shared Library Repository
+
+Create a new repository, for example:
+
+jenkins-shared-library
+
+Structure:
+
+Step-1:
+jenkins-shared-library
+│
+├── vars
+│     buildMaven.groovy
+          def call(String pomPath) {
+                echo "Building Maven project"
+                sh "mvn -f ${pomPath} clean package"
+          }
+
+
+
+Step 2: Configure the Shared Library in Jenkins
+
+Go to:
+
+Manage Jenkins
+    ↓
+System
+    ↓
+Global Trusted Pipeline Libraries
+
+Configure:
+
+Library Name:
+devops-library
+
+Default Version:
+main
+
+Retrieval Method:
+Modern SCM
+
+SCM:
+Git
+
+Repository:
+https://github.com/<your-username>/jenkins-shared-library.git
+
+Save.
+
+
+
+Step 3: Create the Pipeline Job
+
+Create a Pipeline job.
+
+Configure:
+
+Pipeline script from SCM
+
+Git Repository
+
+https://github.com/varmasa/JenkinsWithJavaWEBApp.git
+
+Branch
+
+*/main
+
+Script Path
+
+Jenkinsfile
+
+
+
+Step 4: Jenkinsfile in Your Repository
+
+Place this Jenkinsfile in the root of JenkinsWithJavaWEBApp:
+
+@Library('devops-library') _
+
+pipeline {
+
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                buildMaven("webapp-java/pom.xml")
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Build Successful"
+        }
+
+        failure {
+            echo "Build Failed"
+        }
+    }
+}
