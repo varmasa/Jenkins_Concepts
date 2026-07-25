@@ -1,0 +1,110 @@
+Install Jenkins in one-server
+Install Splunk in one-server
+
+
+Access it: http://<SPLUNK_PUBLIC_IP>:8000 
+
+
+S1: Enable HTTP Event Collector (HEC)
+Go to:
+
+Settings
+→ Data Inputs
+→ HTTP Event Collector
+Click Global Settings.
+
+Enable:
+
+✔ All Tokens
+Save.
+
+
+S2: Create an HEC Token
+Go to:
+
+Settings
+→ Data Inputs
+→ HTTP Event Collector
+→ New Token
+
+Configure:
+
+Field	Value
+Name	JenkinsHEC
+Source name	Jenkins
+Source type	jenkins
+Index	main
+
+Click Next until Submit.
+
+
+S3: Test HEC from the Jenkins EC2
+
+From your Jenkins server, run:
+
+curl -k https://<SPLUNK_IP>:8088/services/collector \
+-H "Authorization: Splunk YOUR_HEC_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{"event":"Hello from Jenkins"}'
+
+Expected response:
+
+{
+  "text":"Success",
+  "code":0
+}
+
+
+S4: Verify the Event in Splunk
+In Splunk Search & Reporting, search:
+source=Jenkins
+
+
+S5: Store the Token in Jenkins
+Go to:
+Manage Jenkins
+→ Credentials
+→ System
+→ Global credentials
+Add a Secret text credential:
+Kind: Secret text
+Secret: Your HEC Token
+ID: splunk-hec-token
+Save.
+
+
+S6: Test it from pipeline
+pipeline {
+    agent any
+
+    environment {
+        SPLUNK_URL = 'https://<SPLUNK_IP>:8088/services/collector'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+
+        stage('Send Event to Splunk') {
+            steps {
+                withCredentials([string(credentialsId: 'splunk-hec-token', variable: 'HEC_TOKEN')]) {
+                    sh '''
+                    curl -k $SPLUNK_URL \
+                    -H "Authorization: Splunk $HEC_TOKEN" \
+                    -H "Content-Type: application/json" \
+                    -d '{
+                        "event":{
+                            "job":"'"$JOB_NAME"'",
+                            "build":"'"$BUILD_NUMBER"'",
+                            "status":"SUCCESS"
+                        }
+                    }'
+                    '''
+                }
+            }
+        }
+    }
+}
